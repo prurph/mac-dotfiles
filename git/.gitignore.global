@@ -1,0 +1,4 @@
+# Add with $ git config --global core.excludesfile '~/path/to/this/file'
+
+.DS_Store
+*.swp

@@ -1,0 +1,39 @@
+{;
+  :default true
+  :alone 400
+  :delay 200
+  :held 250
+  :simlayer-threshold 250
+
+  :modifiers {;
+    :hyper [:left_command :left_control :left_option :left_shift]
+    :ultra [:left_command :left_control :left_option :left_shift :fn]
+  }
+  :templates {;
+    :activate "~/Dotfiles/bin/activate-app.sh %s"
+  }
+
+  :main [;
+    ;; !  | mandatory
+    ;; #  | optional
+    ;; C  | left_command
+    ;; T  | left_control
+    ;; O  | left_option
+    ;; S  | left_shift
+    ;; F  | fn
+    ;; Q  | right_command
+    ;; W  | right_control
+    ;; E  | right_option
+    ;; R  | right_shift
+    ;; P  | caps_lock
+    ;; !! | mandatory command + control + optional + shift (hyper)
+    ;; ## | optional any
+    {:des "caps_lock: esc, ctrl with modifier, toggle terminal with cmd"
+     :rules [[:!Ccaps_lock [:activate "kitty"]]
+             [:##caps_lock :left_control nil {:alone :escape}]]
+    }
+    {:des "right_command: hyper"
+     :rules [[:##right_command :!CTOleft_shift]] ; abbreviations for modifiers but literal left_shift to actually send something
+    } 
+  ]
+}
