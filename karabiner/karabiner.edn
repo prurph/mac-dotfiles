@@ -12,6 +12,11 @@
   :templates {;
     :activate "~/Dotfiles/bin/activate-app.sh %s"
   }
+  :applications {;
+    :vi-mode-disabled-app [;
+      "^net\\.kovidgoyal\\.kitty$"
+    ]
+  }
 
   :main [;
     ;; !  | mandatory
@@ -28,12 +33,86 @@
     ;; P  | caps_lock
     ;; !! | mandatory command + control + optional + shift (hyper)
     ;; ## | optional any
-    {:des "caps_lock: esc, ctrl with modifier, toggle terminal with cmd"
-     :rules [[:!Ccaps_lock [:activate "kitty"]]
-             [:##caps_lock :left_control nil {:alone :escape}]]
-    }
+
+
     {:des "right_command: hyper"
      :rules [[:##right_command :!CTOleft_shift]] ; abbreviations for modifiers but literal left_shift to actually send something
     } 
+
+    {:des "tap r-shift twice: toggle vim normal mode, then press v for visual mode"
+     :rules [[:n "say 'normal'" ["vi-normal-mode" 1]]
+             [:v "say 'visual'" ["vi-visual-mode" 1]]
+
+             ; If pending: right shift goes into normal. Must come before the clearing if alone
+             [:right_shift [:right_shift ["vi-normal-mode" 1] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]
+                           ["vi-mode-pending" 1]]
+
+             ; Always send right shift unconditionally, otherwise it won't work like a shift key.
+             ; If alone, set pending mode; the clause above will capture it and go into normal, then
+             ; this also fires and the :delayed :invoked moves us out of pending. Alternatively,
+             ; if the chord times out and nothing is pressed, the :canceled also exits pending.
+             [:right_shift :right_shift nil
+              {:alone [:right_shift ["vi-mode-pending" 1]]
+               :delayed {:invoked ["vi-mode-pending" 0] :canceled ["vi-mode-pending" 0]}}]
+
+             [:condi :vi-mode-pending :!vi-mode-disabled-app]
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+
+             [:condi :vi-normal-mode :!vi-mode-disabled-app]
+             ; Exit with escape or caps
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+
+             ; From normal, v enters visual
+             [:v [["vi-normal-mode" 0] ["vi-visual-mode" 1] ["vi-mode-pending" 0]]]
+
+             ; Actual normal mode functionality
+             [:##h :left_arrow]
+             [:##j :down_arrow]
+             [:##k :up_arrow]
+             [:##l :right_arrow]
+             [:##b :!Oleft_arrow]
+             [:##e :!Oright_arrow]
+             ; TODO: there's some funky macOS preferences stuff you can do to get (e)nd vs (w)ord behavior.
+             ; Out of the box option right arrow moves to the end of words.
+             [:##0 :!Cleft_arrow]
+             [:##4 :!Cright_arrow]
+
+             [:condi :vi-visual-mode :!vi-mode-disabled-app]
+             ; Exit with escape or caps
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+
+             ; Actual visual mode functionality
+             [:##h :!Sleft_arrow]
+             [:##j :!Sdown_arrow]
+             [:##k :!Sup_arrow]
+             [:##l :!Sright_arrow]
+             [:##b :!SOleft_arrow]
+             [:##e :!SOright_arrow]
+             [:##0 :!SCleft_arrow]
+             [:##4 :!SCright_arrow]
+             [:##open_bracket :!SOup_arrow]
+             [:##close_bracket :!SOdown_arrow]
+    ]}
+
+    {:des "caps_lock: esc, ctrl with modifier, toggle terminal with cmd"
+     :rules [; Must map variable updates first—cannot capture remapped escape
+             ;[:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]
+             ;            ["vi-mode-pending" 1]]
+             ;[:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]
+             ;            ["vi-normal-mode" 1]]
+             ;[:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]
+             ;            ["vi-visual-mode" 1]]
+             [:!Ccaps_lock [:activate "kitty"]]
+             [:##caps_lock :left_control nil {:alone :escape}]]
+    }
   ]
 }
