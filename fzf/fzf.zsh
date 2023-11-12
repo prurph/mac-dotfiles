@@ -1,6 +1,25 @@
 # Based on https://github.com/jannis-baum/fzf-dotfiles/blob/main/fzf.zsh
 # key bindings -----------------------------------------------------------------
 
+_pretty_print_keybinding() {
+  sed -e 's/ctrl-/^/' -e 's/alt-/󰘵/' -e 's/enter/󰌑/' <<< $1
+}
+
+# Output a pretty display bar with slashes on each side. Arguments:
+# $1: the text inside the bar
+# $2: text color, by index
+# $3: bar color, by index
+# $4: bg color of left edge (resets to default if omitted)
+_slash_display_bar() {
+  [[ -v 4 ]] && bg="48;5;${4}m" || bg="49m"
+  echo "\x1b[38;5;${3}m\x1b[38;5;${2}m\x1b[48;5;${3}m$1\x1b[38;5;${3}m\x1b[$bg"
+}
+
+_trail_slash_display_bar() {
+  [[ -v 4 ]] && bg="48;5;${4}m" || bg="49m"
+  echo "\x1b[38;5;${2}m\x1b[48;5;${3}m$1\x1b[38;5;${3}m\x1b[$bg"
+}
+
 # action_1 for finder
 #   - enter           open file in editor / cds to directory
 #   - action_1        write pick to buffer (also happens when buffer not empty)
@@ -11,15 +30,17 @@
 _fzf_finder() {
     [[ -z "$1" ]] && local target_dir="." || local target_dir=$1
 
-    local act_1=$(sed 's/ctrl-/^/' <<< $FZFDF_ACT_1)
-    local act_2=$(sed 's/ctrl-/^/' <<< $FZFDF_ACT_2)
-    local act_n=$(sed 's/ctrl-/^/' <<< $FZFDF_ACT_NEW)
-    local act_r=$(sed 's/ctrl-/^/' <<< $FZFDF_ACT_RELOAD)
-    local header=$(cat <<-EOF
-Syntax: 'exact ^prefix suffix$ !inverse
-? preview 󰌑 cd/open $act_1 write to buffer $act_2 find here $act_n new file $act_r show ignored
+    local act_1=$(_pretty_print_keybinding $FZFDF_ACT_1)
+    local act_2=$(_pretty_print_keybinding $FZFDF_ACT_2)
+    local act_n=$(_pretty_print_keybinding $FZFDF_ACT_NEW)
+    local act_r=$(_pretty_print_keybinding $FZFDF_ACT_RELOAD)
+
+    local header=$(cat <<EOF
+$(_trail_slash_display_bar '  ' 0 2 0)$(_slash_display_bar "'exact ^prefix suffix$ !inverse " 2 0)
+$(_trail_slash_display_bar ' 󰦂 ' 0 1 0)$(_slash_display_bar "[?]preview [󰌑]open [$act_1]paste selected [$act_2]fzf here [$act_n]new file [$act_r]show ignored " 1 0)
 EOF
 )
+#󰦂
 
     local fd_opts=("--follow" "--strip-cwd-prefix" "--color=always" \
         "--hidden" "--exclude" '**/.git/')
@@ -37,8 +58,9 @@ EOF
                         $FZFDF_TXT;\
                     fi ;\
                 fi" \
-            --preview-window="nohidden" \
+            --preview-window="down,40%,nohidden" \
             --header="$header" \
+            --multi
             --bind "?:change-preview-window(hidden|)" \
             --bind "${FZFDF_ACT_RELOAD}:reload(fd --no-ignore $fd_opts)") \
 
