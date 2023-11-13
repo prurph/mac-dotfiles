@@ -1,31 +1,5 @@
 # From https://github.com/jannis-baum/fzf-dotfiles/blob/main/options.zsh
 
-# ~~~ Default fzf options
-# TODO: consolidate this with the pretty print functions in fzf.zsh
-# for a consistent appearance of the header hint text.
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-  --color=fg:8,bg:-1,gutter:-1,border:8,preview-border:8,hl:4
-  --color=fg+:-1,bg+:-1,hl+:4
-  --color=info:#eacb8a,prompt:#bf6069,pointer:#b48dac
-  --color=marker:#a3be8b,spinner:#b48dac
-  --bind=ctrl-e:preview-down,ctrl-y:preview-up
-  --bind=ctrl-f:preview-page-down,ctrl-b:preview-page-up
-  --bind=ctrl-d:preview-half-page-down,ctrl-u:preview-half-page-up
-  --bind=alt-j:preview-half-page-down,alt-k:preview-half-page-up
-  --bind=alt-h:preview-bottom,alt-l:preview-top
-  --marker=" "
-  --pointer="⏺"
-  --prompt="󰍉 "'
-export FZF_CTRL_R_OPTS=$'
-  --preview "echo {}"
-  --preview-window down:3:hidden:wrap,border-top
-  --bind "?:toggle-preview"
-  --layout=reverse
-  --bind "ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort"
-  --border=none
-  --no-separator
-  --header "\x1b[38;5;0m\x1b[48;5;0m\x1b[32m 󰦂 \'exact ^prefix suffix$ !inverse \x1b[31m  [?]preview [^y]yank \x1b[38;5;0m\x1b[49m"'
-
 function __opt_or_fallback() {
     # if option is set, make sure it's exported for vim
     # if not, set it to $2

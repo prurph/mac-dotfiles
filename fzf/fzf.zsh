@@ -1,6 +1,6 @@
 # Based on https://github.com/jannis-baum/fzf-dotfiles/blob/main/fzf.zsh
-# key bindings -----------------------------------------------------------------
 
+# ~~~ Utility formatting functions
 _pretty_print_keybinding() {
   sed -e 's/ctrl-/^/' -e 's/alt-/󰘵/' -e 's/enter/󰌑/' <<< $1
 }
@@ -20,6 +20,44 @@ _trail_slash_display_bar() {
   echo "\x1b[38;5;${2}m\x1b[48;5;${3}m$1\x1b[38;5;${3}m\x1b[$bg"
 }
 
+# ~~~ Default fzf options
+# TODO: consolidate this with the pretty print functions in fzf.zsh
+# for a consistent appearance of the header hint text.
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+  --color=fg:8,bg:-1,gutter:-1,border:8,preview-border:8,hl:4
+  --color=fg+:-1,bg+:-1,hl+:4,scrollbar:3,preview-scrollbar:3
+  --color=info:#eacb8a,prompt:#bf6069,pointer:#b48dac
+  --color=marker:#a3be8b,spinner:#b48dac
+  --bind=ctrl-e:preview-down,ctrl-y:preview-up
+  --bind=ctrl-f:preview-page-down,ctrl-b:preview-page-up
+  --bind=ctrl-d:preview-half-page-down,ctrl-u:preview-half-page-up
+  --bind=alt-j:preview-half-page-down,alt-k:preview-half-page-up
+  --bind=alt-h:preview-bottom,alt-l:preview-top
+  --marker=" "
+  --pointer="⏺"
+  --prompt="󰍉 "'
+
+ctrl_r_header=$(cat <<EOF
+$(_trail_slash_display_bar '  ' 0 2 0)$(_slash_display_bar "'exact ^prefix suffix$ !inverse " 2 0 1)$(_slash_display_bar '󰦂 ' 0 1 0)$(_slash_display_bar "[?]preview [^y]yank " 1 0)
+EOF
+)
+# Desire: add newlines after header so there's a blank line between hints and content
+# Problem: command substitution removes trailing lines.
+# Solution: use process substitution <( ... ), which doesn't remove trailing lines,
+# and read it into the variable with null IFS, which causes read to use all tokens, instead
+# of stopping when it hits the newline.
+IFS= read -rd '' ctrl_r_header < <( printf "$ctrl_r_header\n\n" )
+
+export FZF_CTRL_R_OPTS="
+  --preview 'echo {}'
+  --preview-window down:3:hidden:wrap,border-top
+  --bind '?:toggle-preview'
+  --layout=reverse
+  --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
+  --border=none
+  --no-separator
+  --header=\"$ctrl_r_header\""
+
 # action_1 for finder
 #   - enter           open file in editor / cds to directory
 #   - action_1        write pick to buffer (also happens when buffer not empty)
@@ -36,6 +74,7 @@ _fzf_finder() {
     local act_r=$(_pretty_print_keybinding $FZFDF_ACT_RELOAD)
 
     local header=$(cat <<EOF
+
 $(_trail_slash_display_bar '  ' 0 2 0)$(_slash_display_bar "'exact ^prefix suffix$ !inverse " 2 0)
 $(_trail_slash_display_bar ' 󰦂 ' 0 1 0)$(_slash_display_bar "[?]preview [󰌑]open [$act_1]paste selected [$act_2]fzf here [$act_n]new file [$act_r]show ignored " 1 0)
 EOF
@@ -60,8 +99,8 @@ EOF
                 fi" \
             --preview-window="down,40%,nohidden" \
             --header="$header" \
-            --multi
-            --bind "?:change-preview-window(hidden|)" \
+            --multi \
+            --bind "?:toggle-preview" \
             --bind "${FZFDF_ACT_RELOAD}:reload(fd --no-ignore $fd_opts)") \
 
     zle reset-prompt
