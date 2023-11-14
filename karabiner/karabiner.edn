@@ -45,7 +45,7 @@
 
              ; If pending: right shift goes into normal. Must come before the clearing if alone
              [:right_shift [:right_shift ["vi-normal-mode" 1] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]
-                           ["vi-mode-pending" 1]]
+                           [:vi-mode-pending :!vi-mode-disabled-app]]
 
              ; Always send right shift unconditionally, otherwise it won't work like a shift key.
              ; If alone, set pending mode; the clause above will capture it and go into normal, then
@@ -55,19 +55,25 @@
               {:alone [:right_shift ["vi-mode-pending" 1]]
                :delayed {:invoked ["vi-mode-pending" 0] :canceled ["vi-mode-pending" 0]}}]
 
-             [:condi :vi-mode-pending :!vi-mode-disabled-app]
+             [:condi :vi-mode-pending]
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+
+             [:condi :vi-normal-mode]
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
+
+             [:condi :vi-visual-mode]
              [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
              [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
              [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
              [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
 
              [:condi :vi-normal-mode :!vi-mode-disabled-app]
-             ; Exit with escape or caps
-             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
-             [:escape [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
-             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
-             [:caps_lock [["vi-normal-mode" 0] ["vi-visual-mode" 0] ["vi-mode-pending" 0]]]
-
              ; From normal, v enters visual
              [:v [["vi-normal-mode" 0] ["vi-visual-mode" 1] ["vi-mode-pending" 0]]]
 
