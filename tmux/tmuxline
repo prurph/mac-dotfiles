@@ -1,0 +1,22 @@
+set -g status-justify "left"
+set -g status "on"
+set -g status-left-style "none"
+# command style is vim normal mode when entering commands
+set -g message-style "fg=#abb2bf,bg=#393f4b"
+set -g message-command-style "fg=#abb2bf,bg=#343a46"
+
+set -g pane-active-border-style "fg=#bf616a"
+set -g pane-border-style "fg=#4f5b66"
+
+set -g status-right-style "none"
+set -g status-style "none,bg=#333945"
+set -g status-right-length "100"
+set -g status-left-length "100"
+set -g status-left "#{?client_prefix,#[bg=#b48ead],#[bg=#81a1c1]}#[fg=#343a46] #S #{?client_prefix,#[fg=#b48ead],#[fg=#81a1c1]}#[bg=#464c58] #[fg=#333945]"
+set -g status-right "#{?pane_in_mode,#[fg=#464c58]#[fg=#ebcb8b]#[bg=#464c58]#[fg=#333945]#[bg=#ebcb8b] #[fg=#ebcb8b]#[bg=#393f4b] #{pane_mode} ,}#[fg=#464c58]#[fg=#b48ead,bg=#464c58]#[fg=#333945,bg=#b48ead] 📅 %a %m/%d %H:%M "
+
+setw -g window-status-activity-style "none"
+setw -g window-status-separator ""
+setw -g window-status-style "none,fg=#a3be8c,bg=#333945"
+setw -g window-status-format "#[bg=#333945,fg=#3f4551]#[fg=#a3b38c,bg=#3f4551] #I #W #[fg=#3f4551,bg=#333945]"
+setw -g window-status-current-format "#[bg=#333945,fg=#a3b38c]#[bg=#a3b38c,fg=#343a46] #I #W#{?window_zoomed_flag, 🔍, }#[fg=#a3b38c,bg=#333945]"
