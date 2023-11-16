@@ -9,5 +9,8 @@ return {
     icon_highlights = {
       breadcrumbs = true,
     },
+    separators = {
+      breadcrumbs = " ❱ ",
+    },
   },
 }

@@ -2,6 +2,7 @@ local nvim_tmux_navigation = require "nvim-tmux-navigation"
 
 return {
   n = {
+    -- ~~~ Movement
     -- Unmap the defaults to close all to left/right
     ["<leader>bl"] = nil,
     ["<leader>br"] = nil,
@@ -36,6 +37,12 @@ return {
     ["<C-Space>"] = {
       nvim_tmux_navigation.NvimTmuxNavigateNext,
       desc = "Move to next split [P]",
+    },
+  },
+  i = {
+    ["<C-k>"] = {
+      vim.lsp.buf.signature_help,
+      desc = "Signature help",
     },
   },
 }
